@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>代号：零点 - WW3 Card Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Black+Ops+One&display=swap');
+      
+      body {
+        background-color: #0f1110;
+        color: #e0e0e0;
+        font-family: 'Courier Prime', monospace;
+        overflow: hidden;
+      }
+
+      /* CRT Scanline Effect */
+      .scanlines {
+        background: linear-gradient(
+          to bottom,
+          rgba(255,255,255,0),
+          rgba(255,255,255,0) 50%,
+          rgba(0,0,0,0.2) 50%,
+          rgba(0,0,0,0.2)
+        );
+        background-size: 100% 4px;
+        position: fixed;
+        pointer-events: none;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 9999;
+        animation: scanline 10s linear infinite;
+        opacity: 0.3;
+      }
+
+      .paper-texture {
+         background-color: #dfd8c8;
+         background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+      }
+
+      @keyframes scanline {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 100%; }
+      }
+      
+      @keyframes scanVertical {
+        0% { top: 0%; opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+      }
+      
+      .animate-spin-slow {
+        animation: spin 3s linear infinite;
+      }
+      
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      /* Slow Pulse for Doomsday Labels */
+      .animate-pulse-slow {
+        animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      @keyframes pulse-slow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.75; }
+      }
+
+      /* --- COMBAT ANIMATIONS --- */
+      @keyframes lunge-up {
+        0% { transform: translateY(0) scale(1); }
+        40% { transform: translateY(10px) scale(0.9); } /* Wind up */
+        50% { transform: translateY(-80px) scale(1.2); } /* Strike */
+        100% { transform: translateY(0) scale(1); }
+      }
+
+      @keyframes lunge-down {
+        0% { transform: translateY(0) scale(1); }
+        40% { transform: translateY(-10px) scale(0.9); } /* Wind up */
+        50% { transform: translateY(80px) scale(1.2); } /* Strike */
+        100% { transform: translateY(0) scale(1); }
+      }
+
+      .attack-lunge-up {
+        animation: lunge-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .attack-lunge-down {
+        animation: lunge-down 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      /* --- EPIC STRATEGIC ANIMATIONS --- */
+
+      /* 1. FLYING: Player (Bottom/Right to Board) - Circle and Land */
+      @keyframes flyInPlayerEpic { 
+        0% { transform: translate(120vw, 50vh) scale(0.2) rotate(45deg); opacity: 0; } 
+        40% { transform: translate(-50vw, -20vh) scale(1.5) rotate(-10deg); opacity: 1; z-index: 200; box-shadow: 20px 20px 50px rgba(0,0,0,0.5); }
+        70% { transform: translate(10vw, -30vh) scale(1.2) rotate(5deg); }
+        100% { transform: translate(0,0) scale(1) rotate(0); z-index: 20; } 
+      }
+
+      /* 2. FLYING: Enemy (Top/Left to Board) */
+      @keyframes flyInEnemyEpic { 
+        0% { transform: translate(-120vw, -50vh) scale(0.2) rotate(-135deg); opacity: 0; } 
+        40% { transform: translate(50vw, 20vh) scale(1.5) rotate(10deg); opacity: 1; z-index: 200; box-shadow: -20px 20px 50px rgba(0,0,0,0.5); }
+        70% { transform: translate(-10vw, 10vh) scale(1.2) rotate(-5deg); }
+        100% { transform: translate(0,0) scale(1) rotate(0); z-index: 20; } 
+      }
+
+      /* 3. EMERGE: Submarine / Underground - High Visibility Update */
+      @keyframes emergeEpic { 
+        0% { transform: translate(-60vw, 30px) scale(0.9); opacity: 0.5; filter: brightness(0.6); } 
+        60% { transform: translate(-10vw, 5px) scale(0.95); opacity: 0.9; filter: brightness(0.9); }
+        85% { transform: translate(2vw, -5px) scale(1.02); opacity: 1; filter: brightness(1.2); }
+        100% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); } 
+      }
+
+      /* 4. ORBITAL: Slow, Mysterious, Flashy End */
+      @keyframes orbitalDropEpic { 
+        0% { transform: translateY(-80vh) scale(0.6); opacity: 0; filter: brightness(2); }
+        20% { opacity: 1; transform: translateY(-30vh) scale(0.9); filter: brightness(1.5); }
+        75% { transform: translateY(-10vh) scale(0.95); filter: brightness(1.2); } /* Hover phase */
+        85% { transform: translateY(0) scale(1.1); filter: brightness(5) drop-shadow(0 0 50px white); } /* Impact Flash */
+        100% { transform: translateY(0) scale(1); filter: brightness(1); } 
+      }
+
+      @keyframes orbitalRingContract {
+        0% { transform: scale(3) rotate(0deg); opacity: 0; border-width: 1px; box-shadow: 0 0 10px cyan; }
+        20% { opacity: 1; border-width: 2px; }
+        80% { transform: scale(0.8) rotate(180deg); opacity: 1; border-width: 6px; box-shadow: 0 0 40px cyan, inset 0 0 20px white; }
+        100% { transform: scale(0.1); opacity: 0; }
+      }
+
+      @keyframes emiFuzz {
+        0% { opacity: 0; }
+        1% { opacity: 1; background: white; }
+        5% { opacity: 0; background: transparent; }
+        10% { opacity: 0.5; transform: translate(2px, -2px); }
+        100% { opacity: 0; }
+      }
+
+      /* 5. HEAVY SLAM: 2.5 Seconds */
+      @keyframes heavyHoverDrop { 
+        0% { transform: translate3d(0, -100vh, 0) scale(1.5); opacity: 0; }
+        10% { opacity: 1; transform: translate3d(0, -30vh, 0) scale(1.2); filter: brightness(0.6); }
+        /* Suspense Hover */
+        30% { transform: translate3d(0, -32vh, 0) scale(1.2); }
+        60% { transform: translate3d(0, -28vh, 0) scale(1.2); filter: brightness(1.5); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        70% { transform: translate3d(0, -30vh, 0) scale(1.25); filter: brightness(2); } /* Charge Up */
+        /* The Drop */
+        85% { transform: translate3d(0, 0, 0) scale(0.9); filter: brightness(1); } /* Impact Squish */
+        90% { transform: translate3d(0, -10px, 0) scale(1.05); } /* Bounce */
+        100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; } 
+      }
+      
+      /* 6. STANDARD SMOOTH DEPLOY */
+      @keyframes standardDeploySmooth {
+        0% { opacity: 0; transform: translateY(15px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      /* Global Screen Shake Animation */
+      @keyframes screenShakeAnim {
+        0% { transform: translate(0, 0); }
+        10% { transform: translate(-10px, -10px); }
+        20% { transform: translate(10px, 10px); }
+        30% { transform: translate(-10px, 10px); }
+        40% { transform: translate(10px, -10px); }
+        50% { transform: translate(-5px, -5px); }
+        100% { transform: translate(0, 0); }
+      }
+
+      .entrance-fly-player { animation: flyInPlayerEpic 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; z-index: 100 !important; pointer-events: none; }
+      .entrance-fly-enemy { animation: flyInEnemyEpic 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; z-index: 100 !important; pointer-events: none; }
+      .entrance-emerge { animation: emergeEpic 2s ease-out forwards; z-index: 100 !important; pointer-events: none; }
+      /* Orbital extended to 3s for the slow effect */
+      .entrance-orbital { animation: orbitalDropEpic 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; z-index: 100 !important; pointer-events: none; }
+      /* Heavy fixed to 2.5s */
+      .entrance-heavy { animation: heavyHoverDrop 2.5s cubic-bezier(0.45, 0, 0.55, 1) forwards; z-index: 100 !important; pointer-events: none; }
+      /* Standard */
+      .entrance-standard { animation: standardDeploySmooth 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+      
+      .orbital-rings-fx::before {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 300px; height: 300px;
+        margin-left: -150px; margin-top: -150px;
+        border: 2px solid cyan;
+        border-radius: 50%;
+        animation: orbitalRingContract 2.4s ease-in forwards; /* Synced with drop impact */
+        box-shadow: 0 0 20px cyan;
+        z-index: 50;
+      }
+
+      .orbital-emi-fx::after {
+        content: '';
+        position: absolute;
+        inset: -20px;
+        background: rgba(255, 255, 255, 0.8);
+        animation: emiFuzz 1s 2.5s forwards; /* Trigger flash near end of 3s anim */
+        z-index: 60;
+        pointer-events: none;
+      }
+
+      .screen-shake-active {
+        animation: screenShakeAnim 0.5s ease-out;
+      }
+
+    </style>
+    <!-- Removed CDN importmap to prevent conflict with Vite local resolution -->
+<script type="importmap">
+{
+  "imports": {
+    "electron": "https://aistudiocdn.com/electron@^39.2.3",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "url": "https://aistudiocdn.com/url@^0.11.4"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <div class="scanlines"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
